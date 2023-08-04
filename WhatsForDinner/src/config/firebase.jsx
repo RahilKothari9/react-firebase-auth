@@ -12,15 +12,6 @@ const firebaseConfig = {
   measurementId: "G-72SW30VR1C"
 };
 
-export const registerWithEmailAndPassword = async (email, password) => {
-  try {
-    const res = await createUserWithEmailAndPassword(auth, email, password);
-    
-  } catch (err) {
-    console.error(err);
-    alert(err.message);
-  }
-};
 
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);

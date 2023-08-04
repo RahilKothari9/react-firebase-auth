@@ -3,8 +3,10 @@ import { TextField, Button, Container, Stack, Alert } from '@mui/material';
 import { Link } from "react-router-dom"
 import { useAuth } from '../contexts/AuthContext';
 import { AuthProvider } from '../contexts/AuthContext';
-import { registerWithEmailAndPassword } from '../config/firebase'
- 
+
+import {createUserWithEmailAndPassword} from "firebase/auth";
+import { auth } from "../config/firebase"
+
  
 const Signup = () => {
 
@@ -20,8 +22,17 @@ const Signup = () => {
         if(passwordRef.current.value !== passwordConfirmRef.current.value) {
             return setError('Passwords do not match');
         }
-        registerWithEmailAndPassword(emailRef.current.value, passwordConfirmRef.current.value);
-
+        
+        try {
+            setError('');
+            setLoading(true);
+            await createUserWithEmailAndPassword(auth, emailRef.current.value, passwordRef.current.value);
+            
+          } catch (err) {
+            console.error(err);
+            setError(err)
+            alert(err.message);
+          }
         // try {
         //     setError(' ');
         //     setLoading(true);
