@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import {getAuth} from "firebase/auth";
+import {getAuth, createUserWithEmailAndPassword} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC6u53Xathb8tgVyBXadCP5UuGcuZW5vFY",
@@ -12,6 +12,15 @@ const firebaseConfig = {
   measurementId: "G-72SW30VR1C"
 };
 
+export const registerWithEmailAndPassword = async (email, password) => {
+  try {
+    const res = await createUserWithEmailAndPassword(auth, email, password);
+    
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
+  }
+};
 
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
