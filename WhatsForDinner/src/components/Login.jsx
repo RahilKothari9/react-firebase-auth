@@ -1,65 +1,81 @@
-import React, {useState} from "react";
-import { TextField, FormControl, Button } from "@mui/material";
-import { Link } from "react-router-dom"
+import React, {useState, useRef} from 'react';
+import { TextField, Button, Container, Stack, Alert } from '@mui/material';
+import { Link, useNavigate } from "react-router-dom"
+import { useAuth } from '../contexts/AuthContext';
+import { AuthProvider } from '../contexts/AuthContext';
+import { signIn } from '../config/firebase';
+import {signInWithEmailAndPassword} from "firebase/auth";
+import { auth } from "../config/firebase"
+
  
 const Login = () => {
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [emailError, setEmailError] = useState(false)
-    const [passwordError, setPasswordError] = useState(false)
- 
-    const handleSubmit = (event) => {
-        event.preventDefault()
- 
-        setEmailError(false)
-        setPasswordError(false)
- 
-        if (email == '') {
-            setEmailError(true)
-        }
-        if (password == '') {
-            setPasswordError(true)
-        }
- 
-        if (email && password) {
-            console.log(email, password)
-        }
+
+    const emailRef = useRef()
+    const passwordRef = useRef()
+    const [error, setError] = useState('')
+    const [loading, setLoading] = useState(false)
+    const { login, currentUser } = useAuth()
+    const history = useNavigate()
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+        
+       
+        try {
+            setError('');
+            setLoading(true);
+            await signInWithEmailAndPassword(auth, emailRef.current.value, passwordRef.current.value)
+            history('/')
+            } catch (err) {
+                setError('Failed to Login')
+                //alert(err.message);
+            }
+            setLoading(false);
     }
-     
-    return ( 
-        <React.Fragment>
-        <form autoComplete="off" onSubmit={handleSubmit}>
-            <h2>Login Form</h2>
-                <TextField 
-                    label="Email"
-                    onChange={e => setEmail(e.target.value)}
-                    required
-                    variant="outlined"
-                    color="secondary"
+ 
+    return (
+        <AuthProvider>
+            <React.Fragment>
+            <h2>Login</h2>
+            {currentUser.email}
+            {error && <Alert severity="error">{error}</Alert>}
+            <form onSubmit={handleSubmit} action={<Link to="/login" />}>
+                
+                <TextField
                     type="email"
-                    sx={{mb: 3}}
+                    variant='outlined'
+                    color='secondary'
+                    label="Email"
+                    
+                    inputRef={emailRef}
+                    
                     fullWidth
-                    value={email}
-                    error={emailError}
-                 />
-                 <TextField 
-                    label="Password"
-                    onChange={e => setPassword(e.target.value)}
                     required
-                    variant="outlined"
-                    color="secondary"
+                    sx={{mb: 4}}
+                />
+                <TextField
                     type="password"
-                    value={password}
-                    error={passwordError}
+                    variant='outlined'
+                    color='secondary'
+                    label="Password"
+                    
+                    inputRef={passwordRef}
+                    
+                    required
                     fullWidth
-                    sx={{mb: 3}}
-                 />
-                 <Button variant="outlined" color="secondary" type="submit">Login</Button>
-             
-        </form>
-        {/* <small>Need an account? <Link to="/">Register here</Link></small> */}
+                    sx={{mb: 4}}
+                />
+
+                
+                
+                <Button disabled= {loading} variant="outlined" color="secondary" type="submit">Log In</Button>
+            </form>
+            <small>Need an account? <Link to="/register">Register Here</Link></small>
+     
         </React.Fragment>
-     );
+        </AuthProvider>
+        
+    )
 }
  
 export default Login;

@@ -1,6 +1,6 @@
 import React, {useState, useRef} from 'react';
 import { TextField, Button, Container, Stack, Alert } from '@mui/material';
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from '../contexts/AuthContext';
 import { AuthProvider } from '../contexts/AuthContext';
 
@@ -16,22 +16,25 @@ const Signup = () => {
     const { signup } = useAuth();
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
-
+    const history = useNavigate()
     async function handleSubmit(e) {
         e.preventDefault();
         if(passwordRef.current.value !== passwordConfirmRef.current.value) {
             return setError('Passwords do not match');
+        }
+        if(passwordRef.current.value.length < 6) {
+            return setError('Passwords must be 6 or more characters');
         }
         
         try {
             setError('');
             setLoading(true);
             await createUserWithEmailAndPassword(auth, emailRef.current.value, passwordRef.current.value);
-            
+            history('/')
           } catch (err) {
-            console.error(err);
-            setError(err)
-            alert(err.message);
+            
+            setError('Failed to Register')
+            
           }
         // try {
         //     setError(' ');
@@ -47,7 +50,7 @@ const Signup = () => {
     return (
         <AuthProvider>
             <React.Fragment>
-            <h2>Register Form</h2>
+            <h2>Register</h2>
             {/* {JSON.stringify({currentUser})} */}
             {error && <Alert severity="error">{error}</Alert>}
             <form onSubmit={handleSubmit} action={<Link to="/login" />}>
@@ -91,7 +94,7 @@ const Signup = () => {
                 
                 <Button disabled= {loading} variant="outlined" color="secondary" type="submit">Register</Button>
             </form>
-            {/* <small>Already have an account? <Link to="/login">Login Here</Link></small> */}
+            <small>Already have an account? <Link to="/login">Login Here</Link></small>
      
         </React.Fragment>
         </AuthProvider>
