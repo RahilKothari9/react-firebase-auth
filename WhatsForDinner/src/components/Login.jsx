@@ -37,7 +37,7 @@ const Login = () => {
         <AuthProvider>
             <React.Fragment>
             <h2>Login</h2>
-            {currentUser.email}
+            {currentUser && currentUser.email}
             {error && <Alert severity="error">{error}</Alert>}
             <form onSubmit={handleSubmit} action={<Link to="/login" />}>
                 
